@@ -91,15 +91,16 @@ def add_product():
 @app.route('/get_suggestions', methods=['GET']) # nespejau sitos 
 def get_suggestions():
     all_movies =  Movie.query.all()
+    return_movies = []
     if all_movies:
         sorted_result = sorted(all_movies, key=lambda x: x.rating, reverse=True)
         top_three = sorted_result[:3]
         return_movies = []
         for o_movie in top_three:
-            mov =  Movie.query.get(o_movie.id)
-            return_movies.append(mov)
-        print(return_movies)
-        return return_movies
+            return_movies.append(o_movie.id)
+        elements = Movie.query.filter(Movie.id.in_(return_movies)).all()
+        result = [{'id': element.id, 'Title': element.title, 'Genre':element.genre, 'Rating': element.rating} for element in elements]
+        return jsonify(result)
     else:
         return jsonify({"Error":"no movies in the database"}) 
 
